@@ -61,7 +61,6 @@ describe('api', function() {
           .reply(200);
       api.startPort(PORT, function(err, result) {
         if (err) { throw err; }
-        assert(result === 'ABC123');
         assert(mock.isDone());
         done();
       });
@@ -83,7 +82,6 @@ describe('api', function() {
           .reply(200);
       api.stopPort(PORT, function(err, result) {
         if (err) { throw err; }
-        assert(result === 'ABC123');
         assert(mock.isDone());
         done();
       });
