@@ -98,6 +98,39 @@ describe('api', function() {
         done();
       });
     });
+  });
 
+  describe('#setHeaders', function() {
+    it('should call server with headers as JSON string', function(done) {
+      var mock = mockPost('/proxy/' + PORT + '/headers', {'foo': 'bar'})
+          .matchHeader('Content-Type', JSON_MIME)
+          .reply(200);
+      api.setHeaders(PORT, '{"foo":"bar"}', function(err) {
+        if (err) { throw err; }
+        assert(mock.isDone());
+        done();
+      });
+    });
+
+    it('should call server with headers as object ', function(done) {
+      var mock = mockPost('/proxy/' + PORT + '/headers', {'foo': 'bar'})
+          .matchHeader('Content-Type', JSON_MIME)
+          .reply(200);
+      api.setHeaders(PORT, {'foo': 'bar'}, function(err) {
+        if (err) { throw err; }
+        assert(mock.isDone());
+        done();
+      });
+    });
+
+    it('should return errors', function(done) {
+      var mock = mockPost('/proxy/' + PORT + '/headers')
+          .reply(500);
+      api.setHeaders(PORT, {}, function(err) {
+        assert(err);
+        assert(mock.isDone());
+        done();
+      });
+    });
   });
 });
