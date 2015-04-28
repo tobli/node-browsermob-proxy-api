@@ -98,6 +98,64 @@ describe('api', function() {
     });
   });
 
+  describe('#createHAR', function() {
+    var params = {'initialPageTitle': 'start'};
+
+    it('should call server', function(done) {
+      var mock = mockPut('/proxy/' + PORT + '/har', params)
+          .reply(200);
+      api.createHAR(PORT, params, function(err) {
+        if (err) { throw err; }
+        assert(mock.isDone());
+        done();
+      });
+    });
+
+    it('should return errors', function(done) {
+      var mock = mockPut('/proxy/' + PORT + '/har', params)
+          .reply(500);
+      api.createHAR(PORT, params, function(err) {
+        assert(err);
+        assert(mock.isDone());
+        done();
+      });
+    });
+  });
+
+  describe('#startNewPage', function() {
+    var params = {'pageRef': 'start'};
+
+    it('should call server with params as object', function(done) {
+      var mock = mockPut('/proxy/' + PORT + '/har/pageRef', params)
+          .reply(200);
+      api.startNewPage(PORT, params, function(err) {
+        if (err) { throw err; }
+        assert(mock.isDone());
+        done();
+      });
+    });
+
+    it('should call server with params as string', function(done) {
+      var mock = mockPut('/proxy/' + PORT + '/har/pageRef', params)
+          .reply(200);
+      api.startNewPage(PORT, 'start', function(err) {
+        if (err) { throw err; }
+        assert(mock.isDone());
+        done();
+      });
+    });
+
+    it('should return errors', function(done) {
+      var mock = mockPut('/proxy/' + PORT + '/har/pageRef', params)
+          .reply(500);
+      api.startNewPage(PORT, params, function(err) {
+        assert(err);
+        assert(mock.isDone());
+        done();
+      });
+    });
+  });
+
   describe('#setHeaders', function() {
     it('should call server with headers as JSON string', function(done) {
       var mock = mockPost('/proxy/' + PORT + '/headers', {'foo': 'bar'})
