@@ -1,0 +1,103 @@
+'use strict';
+
+var nock = require('nock'),
+    assert = require('assert'),
+    MobProxy = require('../index');
+
+function mockGet(path) {
+  return nock('http://localhost:8080').get(path);
+}
+
+function mockPost(path, body) {
+  return nock('http://localhost:8080').post(path, body);
+}
+
+function mockPut(path, body) {
+  return nock('http://localhost:8080').put(path, body);
+}
+
+function mockDelete(path) {
+  return nock('http://localhost:8080').delete(path);
+}
+
+var JSON_MIME = 'application/json';
+var JAVASCRIPT_MIME = 'application/javascript';
+var FORM_MIME = 'application/x-www-form-urlencoded';
+
+var PORT = 42;
+
+describe('api', function() {
+  var api;
+
+  beforeEach(function() {
+    api = new MobProxy();
+  });
+
+  describe('#getProxyList', function() {
+    it('should call server', function(done) {
+      var mock = mockGet('/proxy').reply(200, 'ABC123');
+      api.getProxyList(function(err, result) {
+        if (err) { throw err; }
+        assert('ABC123' === result);
+        assert(mock.isDone());
+        done();
+      });
+    });
+
+    it('should return errors', function(done) {
+      var mock = mockGet('/proxy').reply(500);
+      api.getProxyList(function(err) {
+        assert(err);
+        assert(mock.isDone());
+        done();
+      });
+    });
+  });
+
+  describe('#startPort', function() {
+    it('should call server', function(done) {
+      var mock = mockPost('/proxy', {'port': PORT})
+          .matchHeader('Content-Type', FORM_MIME)
+          .reply(200);
+      api.startPort(PORT, function(err, result) {
+        if (err) { throw err; }
+        assert(result === 'ABC123');
+        assert(mock.isDone());
+        done();
+      });
+    });
+
+    it('should return errors', function(done) {
+      var mock = mockPost('/proxy', {'port': PORT}).reply(500);
+      api.startPort(PORT, function(err) {
+        assert(err);
+        assert(mock.isDone());
+        done();
+      });
+    });
+  });
+
+  describe('#stopPort', function() {
+    it('should call server', function(done) {
+      var mock = mockDelete('/proxy/' + PORT)
+          .reply(200);
+      api.stopPort(PORT, function(err, result) {
+        if (err) { throw err; }
+        assert(result === 'ABC123');
+        assert(mock.isDone());
+        done();
+      });
+    });
+
+    it('should return errors', function(done) {
+      var mock = mockDelete('/proxy/' + PORT)
+          .reply(500);
+      api.stopPort(PORT, function(err) {
+        assert(err);
+        assert(mock.isDone());
+        done();
+      });
+    });
+
+  });
+});
